@@ -36,20 +36,10 @@ func NewGitPackage(source *spec.GitSource) Interface {
 }
 
 func (p *GitPackage) Install(ctx context.Context, dir, version string) (lockVersion string, err error) {
-	cmd := exec.CommandContext(ctx, "git", "clone", p.Source.Remote, dir)
+	cmd := exec.CommandContext(ctx, "git", "clone", "-b", version, "--single-branch", "--depth", "1", p.Source.Remote, dir)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	if err != nil {
-		return "", err
-	}
-
-	cmd = exec.CommandContext(ctx, "git", "checkout", version)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Dir = dir
 	err = cmd.Run()
 	if err != nil {
 		return "", err
